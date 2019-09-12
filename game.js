@@ -157,4 +157,4 @@ class Cube {
 }
 
 let cube = new Cube(3);
-cube.rotateSclice('z',2);
+// cube.rotateSclice('z',2);
