@@ -29,6 +29,7 @@ controls.screenSpacePanning = false;
 controls.minDistance = 70;
 controls.maxDistance = 500;
 controls.maxPolarAngle = Math.PI;
+controls.rotateSpeed = 0.3;
 
 
 // Shadows
