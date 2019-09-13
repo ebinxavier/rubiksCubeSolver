@@ -107,6 +107,7 @@ class Cube {
                             pieceGroup.add( faceB );
                        
                         pieceGroup.add( box );
+                        pieceGroup.name=''+i+j+k;
                         scene.add(pieceGroup);
                     }
                     this.blocks[i][j][k].piece = pieceGroup;
@@ -117,38 +118,136 @@ class Cube {
        
     }
 
-    rotateOnAxisX = (direction)=>{
+    rotationMatrixHelper = (i,j,direction='clockwise')=>{
+        const translationOffset = (this.order-1)/2;
+        // Pivot point rotation
+        // Translate to -offset
+        // x' = -y and y' = x;
+        // Translate back to +offset
+        const translatedI = i - translationOffset;
+        const translatedJ = j - translationOffset;
 
+        const rotatedI = translatedJ * (direction==='clockwise'?-1:1);
+        const rotatedJ = translatedI * (direction==='clockwise'?1:-1);
+
+        const x = rotatedI + translationOffset;
+        const y = rotatedJ + translationOffset;
+        return {x,y};
     }
 
-    rotateSclice = (axis, index) => {
+    printSclice = (axis, index)=>{
+        switch(axis){
+            case 'x':
+                    for(let i=0;i<this.order;i++){
+                        let row='';
+                        for(let j=0;j<this.order;j++){
+                            row += this.blocks[index][i][j].piece.name+', ';
+                        }
+                        console.log(row);
+                    }
+            break;
+            case 'y':
+                    for(let i=0;i<this.order;i++){
+                        let row='';
+                        for(let j=0;j<this.order;j++){
+                            row += this.blocks[i][index][j].piece.name+', ';
+                        }
+                        console.log(row);
+                    }
+            break;
+            case 'z':
+                    for(let i=0;i<this.order;i++){
+                        let row='';
+                        for(let j=0;j<this.order;j++){
+                            row += this.blocks[i][j][index].piece.name+', ';
+                        }
+                        console.log(row);
+                    }
+            break;
+        }
+    }
+    
+
+    rotateSclice = (axis, index, direction,del=false) => {
         if(index>=this.order) 
             throw new Error('Rotation not possible on this index : '+index+' because maximum size is : '+(this.order-1));
         if('xyz'.indexOf(axis)==-1)
         throw new Error('Rotation on invalid axis: '+axis);
-
+        let dirAngle;
+        const tempSclice = {};
         switch(axis){
             case 'x':
+                dirAngle = direction==='clockwise'?1:-1;
                 for(let i=0;i<this.order;i++){
                     for(let j=0;j<this.order;j++){
-                    //    scene.remove(this.blocks[index][i][j].piece);
-                        this.blocks[index][i][j].piece.rotateOnAxis(this.axisX,degree(90));
+
+                        if(del)
+                        scene.remove(this.blocks[index][i][j].piece);
+
+                        // Backing up
+                        if(!tempSclice[''+i+j])
+                        tempSclice[''+i+j]= this.blocks[index][i][j].piece;
+
+                        const {x,y} = this.rotationMatrixHelper(i,j,direction=='clockwise'?'':'clockwise');
+                        this.blocks[index][i][j].piece = tempSclice[''+x+y] || this.blocks[index][x][y].piece;
+                       
+                        let totalAngle = 5;
+                        let timer = setInterval(()=>{
+                            if(totalAngle==90) clearInterval(timer);
+                            const rotation = new THREE.Matrix4().makeRotationX(degree(5 * dirAngle));
+                            this.blocks[index][i][j].piece.applyMatrix(rotation);
+                            totalAngle+=5;
+                        },10)
                     }
                 }
             break;
             case 'y':
+                dirAngle = direction==='clockwise'?1:-1;
                 for(let i=0;i<this.order;i++){
                     for(let j=0;j<this.order;j++){
-                    //    scene.remove(this.blocks[i][index][j].piece);
-                        this.blocks[i][index][j].piece.rotateOnAxis(this.axisY,degree(90));
+                        if(del)
+                        scene.remove(this.blocks[i][index][j].piece);
+                        // Backing up
+                        if(!tempSclice[''+i+j])
+                        tempSclice[''+i+j]= this.blocks[i][index][j].piece;
+
+                        const {x,y} = this.rotationMatrixHelper(i,j,direction);
+                        this.blocks[i][index][j].piece = tempSclice[''+x+y] || this.blocks[x][index][y].piece;
+                       
+
+                        let totalAngle = 5;
+                        let timer = setInterval(()=>{
+                            if(totalAngle==90) clearInterval(timer);
+                            const rotation = new THREE.Matrix4().makeRotationY(degree(5 * dirAngle));
+                        this.blocks[i][index][j].piece.applyMatrix(rotation);
+                            totalAngle+=5;
+                        },10)
+
                     }
                 }
             break;
             case 'z':
+                dirAngle = direction==='clockwise'?1:-1;
                 for(let i=0;i<this.order;i++){
                     for(let j=0;j<this.order;j++){
                         // scene.remove(this.blocks[i][j][index].piece);
-                        this.blocks[i][j][index].piece.rotateOnAxis(this.axisZ,degree(90));
+                        if(del)
+                        scene.remove(this.blocks[i][j][index].piece);
+                        // Backing up
+                        if(!tempSclice[''+i+j])
+                        tempSclice[''+i+j]= this.blocks[i][j][index].piece;
+
+                        const {x,y} = this.rotationMatrixHelper(i,j,direction=='clockwise'?'':'clockwise');
+                        this.blocks[i][j][index].piece = tempSclice[''+x+y] || this.blocks[x][y][index].piece;
+                        
+                        
+                        let totalAngle = 5;
+                        let timer = setInterval(()=>{
+                            if(totalAngle==90) clearInterval(timer);
+                            const rotation = new THREE.Matrix4().makeRotationZ(degree(5*dirAngle));
+                        this.blocks[i][j][index].piece.applyMatrix(rotation);
+                            totalAngle+=5;
+                        },10)
                     }
                 }
             break;
@@ -157,4 +256,13 @@ class Cube {
 }
 
 let cube = new Cube(3);
-// cube.rotateSclice('z',2);
+cube.printSclice('x',0);
+console.log('-------')
+setInterval(()=>{
+
+    const rand = Math.floor(Math.random()*10)%3;
+    cube.rotateSclice('xyz'[rand],rand,'clockwise'+rand==2?'1':'');
+    console.log('rand', rand)
+},500);
+
+

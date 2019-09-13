@@ -1,12 +1,13 @@
 
-  
 function onResize() {
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
     renderer.setSize(window.innerWidth, window.innerHeight);
 } 
 window.addEventListener('resize', onResize, false);
-window.addEventListener( 'click', onMouseClick, false );
+window.addEventListener( 'mousedown', onMouseDown, false );
+window.addEventListener( 'mouseup', onMouseUp, false );
+window.addEventListener( 'mousemove', mouseMove, false );
 
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera( 40, window.innerWidth/window.innerHeight, 0.1, 2000 );
@@ -114,7 +115,10 @@ light5.position.set(-lightDimension,-lightDimension,lightDimension)
 
 //  Click event handler
 
-function onMouseClick( event ) {
+let dragStart;
+let dragEnd;
+
+function onMouseDown( event ) {
 // calculate mouse position in normalized device coordinates
 // (-1 to +1) for both components
 
@@ -123,8 +127,56 @@ mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
 
 raycaster.setFromCamera(mouse, camera);
 const intersects = raycaster.intersectObjects(scene.children, true);
+if(intersects.length){
+    controls.enableRotate = false;
+    dragStart = {x:event.clientX, y:event.clientY}
+    }
+else 
+    controls.enableRotate = true;
+   
+    if(intersects.length){
+    const block = intersects.reduce((a,e)=>e.distance<a.distance?e:a,{distance:Infinity});
+    // scene.remove(block.object.parent)
+    console.log(block);
+    }
+}
 
-console.log(intersects);
+function onMouseUp (event){
+    // dragEnd = {x:event.clientX, y:event.clientY};
+    // controls.enableRotate = true;
+    // const dx = dragStart.x-dragEnd.x;
+    // const dy = dragStart.y-dragEnd.y
+    // console.log('delta x/y', dx, dy);
+    // let dir;
+    // if(Math.abs(dx)>Math.abs(dy)){
+    //     if(dx<0) dir='R';
+    //     else dir='L';
+    // } else {
+    //     if(dy<0) dir='D';
+    //     else dir='U';
+    // }
+    // console.log('dir:', dir)
+}
+
+function mouseMove(e){
+    // var vector = new THREE.Vector3();
+
+    // vector.set(
+    //     ( event.clientX / window.innerWidth ) * 2 - 1,
+    //     - ( event.clientY / window.innerHeight ) * 2 + 1,
+    //     0.5 );
+    
+    // vector.unproject( camera );
+    
+    // var dir = vector.sub( camera.position ).normalize();
+    
+    // var distance = - camera.position.z / dir.z;
+    
+    // var pos = camera.position.clone().add( dir.multiplyScalar( distance ) );
+    // // console.log('pos', pos)
+
+    // console.log('pos', event.clientX, event.clientX)
+
 }
 
 
