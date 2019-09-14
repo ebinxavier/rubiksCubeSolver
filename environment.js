@@ -248,7 +248,10 @@ function onMouseUp (event){
     }
     if(!cube.shuffling){
     cube.rotateSclice(rotationAxis,rotationIndex,rotationDirection);
-    if(cube.checkGameStatus()) setTimeout(()=>alert('Congrats...!'),500)
+     setTimeout(()=>{
+         if(cube.checkGameStatus())alert('Congrats...!')
+     },500)
+   
     }
 
     }
