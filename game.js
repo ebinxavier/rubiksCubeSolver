@@ -10,7 +10,7 @@ class Cube {
         this.axisZ = new THREE.Vector3(0,0,1);
         
 
-
+        this.shuffling=false;
         this.order=order;
         this.pieceSize=10;
         this.blocks=[];
@@ -118,6 +118,17 @@ class Cube {
        
     }
 
+    get3DCoordinatesOfPiece = (piece)=>{
+        for(let i=0;i<this.order;i++){
+            for(let j=0;j<this.order;j++){
+                for(let k=0;k<this.order;k++){
+                    if(this.blocks[i][j][k].piece.name == piece.name)
+                    return {x:i,y:j,z:k};
+                }
+            }
+        }
+    }
+
     rotationMatrixHelper = (i,j,direction='clockwise')=>{
         const translationOffset = (this.order-1)/2;
         // Pivot point rotation
@@ -133,6 +144,20 @@ class Cube {
         const x = rotatedI + translationOffset;
         const y = rotatedJ + translationOffset;
         return {x,y};
+    }
+
+    shuffle = (turns=10)=>{
+        this.shuffling=true;
+        const timer =  setInterval(()=>{
+            const rand1 = Math.floor(Math.random()*10)%this.order;
+            const rand2 = Math.floor(Math.random()*10)%this.order;
+            cube.rotateSclice('xyz'[rand1],rand2,'clockwise'+rand1==2?'1':'');
+            turns--;
+            if(turns==0) {
+                clearInterval(timer);
+                this.shuffling=false;
+            }
+        },600);
     }
 
     printSclice = (axis, index)=>{
@@ -255,14 +280,16 @@ class Cube {
     }
 }
 
-let cube = new Cube(3);
-cube.printSclice('x',0);
-console.log('-------')
-setInterval(()=>{
+var query = location.search.replace('?','').replace(/&&/g,'&').split('&').reduce((a,e)=>{
+    data = e.split('=')	
+    return {...a,[data[0]]:data[1]}
+    },{})
 
-    const rand = Math.floor(Math.random()*10)%3;
-    cube.rotateSclice('xyz'[rand],rand,'clockwise'+rand==2?'1':'');
-    console.log('rand', rand)
-},500);
+    // 3=70, 4=100
+controls.minDistance = 80+(query.order-3)*30;
+controls.maxDistance = 300+((query.order-3)*30);
+let cube = new Cube(query.order || 3);
+cube.shuffle(query.shuffle);
+
 
 
