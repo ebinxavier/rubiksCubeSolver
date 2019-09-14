@@ -9,7 +9,7 @@ class Cube {
         this.axisY = new THREE.Vector3(0,1,0);
         this.axisZ = new THREE.Vector3(0,0,1);
         
-
+        this.alreadyWon=false;
         this.shuffling=false;
         this.order=order;
         this.pieceSize=10;
@@ -161,16 +161,17 @@ class Cube {
     }
 
     checkGameStatus = ()=>{
+        if(this.alreadyWon) return false;
         for(let i=0;i<this.order;i++){
             for(let j=0;j<this.order;j++){
                 for(let k=0;k<this.order;k++){
-                    debugger
                     if(this.blocks[i][j][k].piece.name && this.blocks[i][j][k].piece.name !==''+i+j+k){
                         return false;
                     }
                 }
             }
         }
+        this.alreadyWon=true;
         return true;
     }
 

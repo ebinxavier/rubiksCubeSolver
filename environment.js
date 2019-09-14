@@ -46,7 +46,6 @@ controls.dynamicDampingFactor = 0.15;
 
 controls.keys = [ 65, 83, 68 ];
 controls.mouseButtons={LEFT:0,RIGHT:2};
-debugger
 camera.position.set( 50,50,50);
 // controls.enabled = false;
 
