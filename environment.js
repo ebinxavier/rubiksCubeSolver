@@ -246,8 +246,10 @@ function onMouseUp (event){
     if(currentSign===-1){
         rotationDirection = rotationDirection=='clockwise'?'anti':'clockwise';
     }
-    if(!cube.shuffling)
+    if(!cube.shuffling){
     cube.rotateSclice(rotationAxis,rotationIndex,rotationDirection);
+    if(cube.checkGameStatus()) setTimeout(()=>alert('Congrats...!'),500)
+    }
 
     }
     dragStart = undefined;
