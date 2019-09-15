@@ -11,6 +11,7 @@ class Cube {
         
         this.alreadyWon=false;
         this.shuffling=false;
+        this.rotating = false;
         this.order=order;
         this.pieceSize=10;
         this.blocks=[];
@@ -39,14 +40,14 @@ class Cube {
                     const gap = 1.05;
                     const skinProjection = 0.17;
                     const geometryBox = new THREE.BoxGeometry(this.pieceSize,this.pieceSize,this.pieceSize );
-                    const geometryFace = new THREE.PlaneGeometry(this.pieceSize * 0.85,this.pieceSize * 0.85,this.pieceSize );
-                    const materialR = new THREE.MeshStandardMaterial( {color: this.colors[0], side: THREE.DoubleSide} );
-                    const materialG = new THREE.MeshStandardMaterial( {color: this.colors[1], side: THREE.DoubleSide} );
-                    const materialB = new THREE.MeshStandardMaterial( {color: this.colors[2], side: THREE.DoubleSide} );
-                    const materialY = new THREE.MeshStandardMaterial( {color: this.colors[3], side: THREE.DoubleSide} );
-                    const materialO = new THREE.MeshStandardMaterial( {color: this.colors[4], side: THREE.DoubleSide} );
-                    const materialW = new THREE.MeshStandardMaterial( {color: this.colors[5], side: THREE.DoubleSide} );
-                    const materialBox = new THREE.MeshStandardMaterial( {color: 0x111111, side: THREE.DoubleSide} );
+                    const geometryFace = new THREE.PlaneGeometry(this.pieceSize * 0.85,this.pieceSize * 0.85 );
+                    const materialR = new THREE.MeshStandardMaterial( {color: this.colors[0], side: THREE.DoubleSide, roughness:0.8} );
+                    const materialG = new THREE.MeshStandardMaterial( {color: this.colors[1], side: THREE.DoubleSide, roughness:0.8} );
+                    const materialB = new THREE.MeshStandardMaterial( {color: this.colors[2], side: THREE.DoubleSide, roughness:0.8} );
+                    const materialY = new THREE.MeshStandardMaterial( {color: this.colors[3], side: THREE.DoubleSide, roughness:0.8} );
+                    const materialO = new THREE.MeshStandardMaterial( {color: this.colors[4], side: THREE.DoubleSide, roughness:0.8} );
+                    const materialW = new THREE.MeshStandardMaterial( {color: this.colors[5], side: THREE.DoubleSide, roughness:0.8} );
+                    const materialBox = new THREE.MeshStandardMaterial( {color: 0x111111, side: THREE.DoubleSide, roughness:0.8} );
                    
                     // var modifier = new THREE.SubdivisionModifier( 3 );
                     // modifier.modify( geometryFace );
@@ -209,12 +210,18 @@ class Cube {
     
 
     rotateSclice = (axis, index, direction,del=false) => {
+        if(this.rotating) {
+            console.log("Already in one rotation...!");
+            return;
+        }
         if(index>=this.order) 
             throw new Error('Rotation not possible on this index : '+index+' because maximum size is : '+(this.order-1));
         if('xyz'.indexOf(axis)==-1)
         throw new Error('Rotation on invalid axis: '+axis);
         let dirAngle;
+        let rotationAngleInterval =15;
         const tempSclice = {};
+        this.rotating= true;
         switch(axis){
             case 'x':
                 dirAngle = direction==='clockwise'?1:-1;
@@ -231,13 +238,28 @@ class Cube {
                         const {x,y} = this.rotationMatrixHelper(i,j,direction=='clockwise'?'':'clockwise');
                         this.blocks[index][i][j].piece = tempSclice[''+x+y] || this.blocks[index][x][y].piece;
                        
-                        let totalAngle = 5;
-                        let timer = setInterval(()=>{
-                            if(totalAngle==90) clearInterval(timer);
-                            const rotation = new THREE.Matrix4().makeRotationX(degree(5 * dirAngle));
+                        let totalAngle = rotationAngleInterval;
+                        // let timer = setInterval(()=>{
+                        //     if(totalAngle==90) {
+                        //         this.rotating= false;
+                        //         clearInterval(timer);
+                        //     }
+                        //     const rotation = new THREE.Matrix4().makeRotationX(degree(rotationAngleInterval * dirAngle));
+                        //     this.blocks[index][i][j].piece.applyMatrix(rotation);
+                        //     totalAngle+=rotationAngleInterval;
+                        // },10)
+
+                        const doRotationAnimation = ()=> {
+                            if(totalAngle==90) {
+                                this.rotating= false;
+                            } else
+                            requestAnimationFrame( doRotationAnimation );
+
+                            const rotation = new THREE.Matrix4().makeRotationX(degree(rotationAngleInterval * dirAngle));
                             this.blocks[index][i][j].piece.applyMatrix(rotation);
-                            totalAngle+=5;
-                        },10)
+                            totalAngle+=rotationAngleInterval;
+                            };
+                        doRotationAnimation();
                     }
                 }
             break;
@@ -255,13 +277,28 @@ class Cube {
                         this.blocks[i][index][j].piece = tempSclice[''+x+y] || this.blocks[x][index][y].piece;
                        
 
-                        let totalAngle = 5;
-                        let timer = setInterval(()=>{
-                            if(totalAngle==90) clearInterval(timer);
-                            const rotation = new THREE.Matrix4().makeRotationY(degree(5 * dirAngle));
-                        this.blocks[i][index][j].piece.applyMatrix(rotation);
-                            totalAngle+=5;
-                        },10)
+                        let totalAngle = rotationAngleInterval;
+                        // let timer = setInterval(()=>{
+                        //     if(totalAngle==90) {
+                        //         this.rotating= false;
+                        //         clearInterval(timer);
+                        //     }
+                        //     const rotation = new THREE.Matrix4().makeRotationY(degree(rotationAngleInterval * dirAngle));
+                        // this.blocks[i][index][j].piece.applyMatrix(rotation);
+                        //     totalAngle+=rotationAngleInterval;
+                        // },10)
+
+                        const doRotationAnimation = ()=> {
+                            if(totalAngle==90) {
+                                this.rotating= false;
+                            } else
+                            requestAnimationFrame( doRotationAnimation );
+
+                            const rotation = new THREE.Matrix4().makeRotationY(degree(rotationAngleInterval * dirAngle));
+                            this.blocks[i][index][j].piece.applyMatrix(rotation);
+                                totalAngle+=rotationAngleInterval;
+                            };
+                        doRotationAnimation();
 
                     }
                 }
@@ -281,13 +318,28 @@ class Cube {
                         this.blocks[i][j][index].piece = tempSclice[''+x+y] || this.blocks[x][y][index].piece;
                         
                         
-                        let totalAngle = 5;
-                        let timer = setInterval(()=>{
-                            if(totalAngle==90) clearInterval(timer);
-                            const rotation = new THREE.Matrix4().makeRotationZ(degree(5*dirAngle));
+                        let totalAngle = rotationAngleInterval;
+                        // let timer = setInterval(()=>{
+                        //     if(totalAngle==90) {
+                        //         this.rotating= false;
+                        //         clearInterval(timer);
+                        //     }
+                        //     const rotation = new THREE.Matrix4().makeRotationZ(degree(rotationAngleInterval*dirAngle));
+                        // this.blocks[i][j][index].piece.applyMatrix(rotation);
+                        //     totalAngle+=rotationAngleInterval;
+                        // },10)
+
+                        const doRotationAnimation = ()=> {
+                            if(totalAngle==90) {
+                                this.rotating= false;
+                            } else
+                            requestAnimationFrame( doRotationAnimation );
+
+                            const rotation = new THREE.Matrix4().makeRotationZ(degree(rotationAngleInterval*dirAngle));
                         this.blocks[i][j][index].piece.applyMatrix(rotation);
-                            totalAngle+=5;
-                        },10)
+                            totalAngle+=rotationAngleInterval;
+                            };
+                        doRotationAnimation();
                     }
                 }
             break;
@@ -304,7 +356,10 @@ var query = location.search.replace('?','').replace(/&&/g,'&').split('&').reduce
 controls.minDistance = 80+(query.order-3)*30;
 controls.maxDistance = 300+((query.order-3)*30);
 let cube = new Cube(query.order || 3);
-cube.shuffle(query.shuffle);
+
+function shuffle(){
+    cube.shuffle(query.shuffle);
+}
 
 
 

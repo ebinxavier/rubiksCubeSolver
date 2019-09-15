@@ -55,8 +55,8 @@ renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap; // default THREE.PCFShadowMap
 
 //Create a SpotLight and turn on shadows for the light
-const lightDimension=100;
-const light = new THREE.AmbientLight( 0xdddddd ); // soft white light
+const lightDimension=500;
+const light = new THREE.AmbientLight( 0xdddddd,0.5 ); // soft white light
 scene.add( light );
 
 
@@ -257,10 +257,13 @@ function onMouseUp (event){
     dragStart = undefined;
     dragEnd = undefined;
 }
-
+let mouseEventQuata=5;
+let mouseEventLimit = mouseEventQuata;
 function mouseMove(e){
+    if(mouseEventLimit<0){
     mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
     mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+    console.log('mouse in', mouseEventLimit);
     raycaster.setFromCamera(mouse, camera);
     const intersects = raycaster.intersectObjects(scene.children, true);
     if(intersects.length==0){
@@ -270,7 +273,9 @@ function mouseMove(e){
         dragEnd=intersects[0].point
         controls.enabled = false;
     }
-
+    mouseEventLimit=mouseEventQuata;
+    }   
+    mouseEventLimit--;
 }
 
 const animate = function () {
