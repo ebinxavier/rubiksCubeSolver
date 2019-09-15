@@ -263,7 +263,6 @@ function mouseMove(e){
     if(mouseEventLimit<0 || dragStart){
     mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
     mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
-    console.log('mouse in', mouseEventLimit);
     raycaster.setFromCamera(mouse, camera);
     const intersects = raycaster.intersectObjects(scene.children, true);
     if(intersects.length==0){
