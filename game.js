@@ -360,6 +360,3 @@ let cube = new Cube(query.order || 3);
 function shuffle(){
     cube.shuffle(query.shuffle);
 }
-
-
-
