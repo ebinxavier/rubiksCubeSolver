@@ -31,7 +31,7 @@ class Cube {
         this.createPieces();
         camera.position.z = order * 25;
     }
-    colors =[0xff0000, 0x00ff00, 0x0000ff, 0xffff00, 0xff8c00, 0xffffff]
+    colors = [0xff0000, 0x00ff00, 0x0000ff, 0xffff00, 0xff8c00, 0xffffff]
 
     createPieces = ()=>{
         for(let i=0;i<this.order;i++){
@@ -348,7 +348,7 @@ class Cube {
 }
 
 var query = location.search.replace('?','').replace(/&&/g,'&').split('&').reduce((a,e)=>{
-    data = e.split('=')	
+    const data = e.split('=')	
     return {...a,[data[0]]:data[1]}
     },{})
 

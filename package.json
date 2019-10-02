@@ -1,0 +1,19 @@
+{
+  "name": "rubicksCube",
+  "version": "1.0.0",
+  "description": "* Clone the repo * Run a static file server like 'superstatic' in the root folder, or open the index.html * Or online [demo](https://ebinxavier.github.io/rubiksCube?order=3&&shuffle=4) * You can play with `order` and `shuffle` parameters ot get different size cube and different shuffling counts.",
+  "main": "environment.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "babel src -d build"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@babel/cli": "^7.6.2",
+    "@babel/core": "^7.6.2",
+    "@babel/plugin-proposal-class-properties": "^7.5.5",
+    "@babel/preset-env": "^7.6.2"
+  }
+}
