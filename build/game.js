@@ -189,40 +189,34 @@ var Cube = function Cube(order) {
     }
   };
 
-  this.checkGameStatus = function () {
-    // if(this.alreadyWon) return false;
-    for (var i = 0; i < _this.order; i++) {
-      for (var j = 0; j < _this.order; j++) {
-        var data = [];
-
-        for (var k = 0; k < _this.order; k++) {
-          console.log(_this.blocks[i][j][k].piece.name);
-          data.push(_this.blocks[i][j][k].piece.name.split(''));
-        }
-
-        console.log("Row");
-
-        if (i === 0 && j === 0) {
-          _this.mergeSlice({
-            initial: true,
-            data: data
-          });
-        } else {
-          _this.mergeSlice({
-            data: data
-          });
-        }
-      }
-
-      console.log("slice");
-    }
-
-    _this.alreadyWon = 3 == _this.mergeObj.reduce(function (_final, slice) {
-      return _final + slice.reduce(function (total, e) {
-        return Number(e) + total;
-      }, 0);
-    }, 0);
-    return _this.alreadyWon;
+  this.checkGameStatus = function () {// // if(this.alreadyWon) return false;
+    // for(let i=0;i<this.order;i++){
+    //     for(let j=0;j<this.order;j++){
+    //         let data=[];
+    //         for(let k=0;k<this.order;k++){
+    //             console.log(this.blocks[i][j][k].piece.name)
+    //            data.push(this.blocks[i][j][k].piece.name.split(''));
+    //         }
+    //         // const columnCounter = 0;
+    //         // for(let x in data){
+    //         //     const sum =0;
+    //         //     for(let y in data[x]){
+    //         //         sum +=Number(data[y][x] || '1');
+    //         //     }
+    //         //     if(sum/3 != data[0][x]) columnCounter++;
+    //         // }
+    //         // if(columnCounter>1) return false;
+    //         console.log("Row")
+    //         if(i===0 && j===0){
+    //             this.mergeSlice({initial:true, data })
+    //         } else{
+    //             this.mergeSlice({ data }) 
+    //         }
+    //     }
+    //     console.log("slice")
+    // }
+    // this.alreadyWon = 3 == this.mergeObj.reduce((final, slice)=>final+slice.reduce((total,e)=>Number(e)+total, 0),0);
+    // return this.alreadyWon;
   };
 
   this.printSclice = function (axis, index) {
