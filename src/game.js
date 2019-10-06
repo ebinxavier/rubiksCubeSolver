@@ -15,6 +15,7 @@ class Cube {
         this.order=order;
         this.pieceSize=10;
         this.blocks=[];
+        this.mergeObj=[];
         this.offset= (order-1) * this.pieceSize / 2;
         for(let i=0;i<order;i++){
             let sclice=[];
@@ -148,6 +149,7 @@ class Cube {
     }
 
     shuffle = (turns=10)=>{
+        this.alreadyWon=false;
         this.shuffling=true;
         const timer =  setInterval(()=>{
             const rand1 = Math.floor(Math.random()*10)%this.order;
@@ -161,19 +163,39 @@ class Cube {
         },600);
     }
 
+    mergeSlice = ({initial=false, data})=>{
+        if(initial){
+            this.mergeObj= [...data];
+        } else{
+            const newObj = [];
+            data.forEach((slice, i)=>{
+                if(slice.length==0) slice = ["1","1","1"];
+                newObj.push(slice.map((e,j)=>this.mergeObj[i][j] == e ? e : "0"));
+            })
+            this.mergeObj = newObj;
+        }
+    }
+
     checkGameStatus = ()=>{
-        if(this.alreadyWon) return false;
+        // if(this.alreadyWon) return false;
         for(let i=0;i<this.order;i++){
             for(let j=0;j<this.order;j++){
+                let data=[];
                 for(let k=0;k<this.order;k++){
-                    if(this.blocks[i][j][k].piece.name && this.blocks[i][j][k].piece.name !==''+i+j+k){
-                        return false;
-                    }
+                    console.log(this.blocks[i][j][k].piece.name)
+                   data.push(this.blocks[i][j][k].piece.name.split(''));
+                }
+                console.log("Row")
+                if(i===0 && j===0){
+                    this.mergeSlice({initial:true, data })
+                } else{
+                    this.mergeSlice({ data }) 
                 }
             }
+            console.log("slice")
         }
-        this.alreadyWon=true;
-        return true;
+        this.alreadyWon = 3 == this.mergeObj.reduce((final, slice)=>final+slice.reduce((total,e)=>Number(e)+total, 0),0);
+        return this.alreadyWon;
     }
 
     printSclice = (axis, index)=>{

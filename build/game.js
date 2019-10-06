@@ -6,6 +6,14 @@ function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { va
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
+function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _nonIterableSpread(); }
+
+function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance"); }
+
+function _iterableToArray(iter) { if (Symbol.iterator in Object(iter) || Object.prototype.toString.call(iter) === "[object Arguments]") return Array.from(iter); }
+
+function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = new Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } }
+
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var degree = function degree(rad) {
@@ -145,6 +153,7 @@ var Cube = function Cube(order) {
 
   this.shuffle = function () {
     var turns = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 10;
+    _this.alreadyWon = false;
     _this.shuffling = true;
     var timer = setInterval(function () {
       var rand1 = Math.floor(Math.random() * 10) % _this.order;
@@ -161,21 +170,59 @@ var Cube = function Cube(order) {
     }, 600);
   };
 
-  this.checkGameStatus = function () {
-    if (_this.alreadyWon) return false;
+  this.mergeSlice = function (_ref) {
+    var _ref$initial = _ref.initial,
+        initial = _ref$initial === void 0 ? false : _ref$initial,
+        data = _ref.data;
 
+    if (initial) {
+      _this.mergeObj = _toConsumableArray(data);
+    } else {
+      var newObj = [];
+      data.forEach(function (slice, i) {
+        if (slice.length == 0) slice = ["1", "1", "1"];
+        newObj.push(slice.map(function (e, j) {
+          return _this.mergeObj[i][j] == e ? e : "0";
+        }));
+      });
+      _this.mergeObj = newObj;
+    }
+  };
+
+  this.checkGameStatus = function () {
+    // if(this.alreadyWon) return false;
     for (var i = 0; i < _this.order; i++) {
       for (var j = 0; j < _this.order; j++) {
+        var data = [];
+
         for (var k = 0; k < _this.order; k++) {
-          if (_this.blocks[i][j][k].piece.name && _this.blocks[i][j][k].piece.name !== '' + i + j + k) {
-            return false;
-          }
+          console.log(_this.blocks[i][j][k].piece.name);
+          data.push(_this.blocks[i][j][k].piece.name.split(''));
+        }
+
+        console.log("Row");
+
+        if (i === 0 && j === 0) {
+          _this.mergeSlice({
+            initial: true,
+            data: data
+          });
+        } else {
+          _this.mergeSlice({
+            data: data
+          });
         }
       }
+
+      console.log("slice");
     }
 
-    _this.alreadyWon = true;
-    return true;
+    _this.alreadyWon = 3 == _this.mergeObj.reduce(function (_final, slice) {
+      return _final + slice.reduce(function (total, e) {
+        return Number(e) + total;
+      }, 0);
+    }, 0);
+    return _this.alreadyWon;
   };
 
   this.printSclice = function (axis, index) {
@@ -400,6 +447,7 @@ var Cube = function Cube(order) {
   this.order = order;
   this.pieceSize = 10;
   this.blocks = [];
+  this.mergeObj = [];
   this.offset = (order - 1) * this.pieceSize / 2;
 
   for (var i = 0; i < order; i++) {
