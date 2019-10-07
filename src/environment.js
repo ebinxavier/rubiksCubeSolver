@@ -325,7 +325,8 @@ function onMouseUp (event){
     if(!cube.shuffling){
     cube.rotateSclice(rotationAxis,rotationIndex,rotationDirection);
      setTimeout(()=>{
-         if(cube.checkGameStatus())alert('Congrats...!')
+         if(cube.checkGameStatus())
+            cube.showCongrats();
      },500)
    
     }
@@ -414,7 +415,8 @@ function touchEnd (event){
     if(!cube.shuffling){
     cube.rotateSclice(rotationAxis,rotationIndex,rotationDirection);
      setTimeout(()=>{
-        //  if(cube.checkGameStatus())alert('Congrats...!')
+         if(cube.checkGameStatus())
+         cube.showCongrats();
      },500)
    
     }

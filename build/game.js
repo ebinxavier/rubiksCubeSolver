@@ -170,6 +170,10 @@ var Cube = function Cube(order) {
     }, 600);
   };
 
+  this.showCongrats = function () {
+    if (confirm("Congrats..! Do you want to shuffle?")) shuffle();
+  };
+
   this.mergeSlice = function (_ref) {
     var _ref$initial = _ref.initial,
         initial = _ref$initial === void 0 ? false : _ref$initial,
@@ -177,7 +181,7 @@ var Cube = function Cube(order) {
 
     if (initial) {
       _this.mergeObj = _toConsumableArray(data);
-    } else {
+    } else if (_this.mergeObj) {
       var newObj = [];
       data.forEach(function (slice, i) {
         if (slice.length == 0) slice = ["1", "1", "1"];
@@ -185,11 +189,122 @@ var Cube = function Cube(order) {
           return _this.mergeObj[i][j] == e ? e : "0";
         }));
       });
+      var expectedSum = data.reduce(function (a, e, i) {
+        return a + i;
+      }, '');
+      var valid = false;
+
+      var _loop = function _loop(i) {
+        //x,y,z
+        var sum = "";
+
+        for (var j = 0; j < data.length; j++) {
+          sum += newObj[j][i];
+        }
+
+        if (expectedSum.split('').every(function (e) {
+          return sum.includes(e);
+        })) {
+          valid = true;
+        }
+      };
+
+      for (var i = 0; i < 3; i++) {
+        _loop(i);
+      }
+
+      if (!valid) {
+        newObj = false;
+      }
+
       _this.mergeObj = newObj;
     }
   };
 
-  this.checkGameStatus = function () {// // if(this.alreadyWon) return false;
+  this.checkGameStatus = function () {
+    // Check whether 3 sides are of same color.
+    if (_this.alreadyWon) return false;
+
+    for (var _i = 0, _arr = [0, _this.order - 1]; _i < _arr.length; _i++) {
+      var i = _arr[_i];
+      var initial = true;
+
+      for (var j = 0; j < _this.order; j++) {
+        var data = [];
+
+        for (var k = 0; k < _this.order; k++) {
+          data.push(_this.blocks[i][j][k].piece.name.split(''));
+        }
+
+        _this.mergeSlice({
+          initial: initial,
+          data: data
+        });
+
+        initial = false;
+      }
+
+      if (!_this.mergeObj) {
+        // not won
+        return false;
+      }
+    }
+
+    for (var _i2 = 0, _arr2 = [0, _this.order - 1]; _i2 < _arr2.length; _i2++) {
+      var _i4 = _arr2[_i2];
+      var _initial = true;
+
+      for (var _j = 0; _j < _this.order; _j++) {
+        var _data = [];
+
+        for (var _k = 0; _k < _this.order; _k++) {
+          _data.push(_this.blocks[_j][_k][_i4].piece.name.split(''));
+        }
+
+        _this.mergeSlice({
+          initial: _initial,
+          data: _data
+        });
+
+        _initial = false;
+      }
+
+      if (!_this.mergeObj) {
+        // not won
+        return false;
+      }
+    }
+
+    for (var _i3 = 0, _arr3 = [0, _this.order - 1]; _i3 < _arr3.length; _i3++) {
+      var _i5 = _arr3[_i3];
+      var _initial2 = true;
+
+      for (var _j2 = 0; _j2 < _this.order; _j2++) {
+        var _data2 = [];
+
+        for (var _k2 = 0; _k2 < _this.order; _k2++) {
+          _data2.push(_this.blocks[_i5][_k2][_j2].piece.name.split(''));
+        }
+
+        _this.mergeSlice({
+          initial: _initial2,
+          data: _data2
+        });
+
+        _initial2 = false;
+      }
+
+      if (!_this.mergeObj) {
+        // not won
+        return false;
+      }
+    }
+
+    _this.alreadyWon = true;
+    return _this.alreadyWon;
+  };
+
+  this.checkGameStatusold = function () {// // if(this.alreadyWon) return false;
     // for(let i=0;i<this.order;i++){
     //     for(let j=0;j<this.order;j++){
     //         let data=[];
@@ -235,11 +350,11 @@ var Cube = function Cube(order) {
         break;
 
       case 'y':
-        for (var _i = 0; _i < _this.order; _i++) {
+        for (var _i6 = 0; _i6 < _this.order; _i6++) {
           var _row = '';
 
-          for (var _j = 0; _j < _this.order; _j++) {
-            _row += _this.blocks[_i][index][_j].piece.name + ', ';
+          for (var _j3 = 0; _j3 < _this.order; _j3++) {
+            _row += _this.blocks[_i6][index][_j3].piece.name + ', ';
           }
 
           console.log(_row);
@@ -248,11 +363,11 @@ var Cube = function Cube(order) {
         break;
 
       case 'z':
-        for (var _i2 = 0; _i2 < _this.order; _i2++) {
+        for (var _i7 = 0; _i7 < _this.order; _i7++) {
           var _row2 = '';
 
-          for (var _j2 = 0; _j2 < _this.order; _j2++) {
-            _row2 += _this.blocks[_i2][_j2][index].piece.name + ', ';
+          for (var _j4 = 0; _j4 < _this.order; _j4++) {
+            _row2 += _this.blocks[_i7][_j4][index].piece.name + ', ';
           }
 
           console.log(_row2);
@@ -281,8 +396,8 @@ var Cube = function Cube(order) {
       case 'x':
         dirAngle = direction === 'clockwise' ? 1 : -1;
 
-        var _loop = function _loop(i) {
-          var _loop2 = function _loop2(j) {
+        var _loop2 = function _loop2(i) {
+          var _loop3 = function _loop3(j) {
             if (del) scene.remove(_this.blocks[index][i][j].piece); // Backing up
 
             if (!tempSclice['' + i + j]) tempSclice['' + i + j] = _this.blocks[index][i][j].piece;
@@ -318,12 +433,12 @@ var Cube = function Cube(order) {
           };
 
           for (var j = 0; j < _this.order; j++) {
-            _loop2(j);
+            _loop3(j);
           }
         };
 
         for (var i = 0; i < _this.order; i++) {
-          _loop(i);
+          _loop2(i);
         }
 
         break;
@@ -331,8 +446,8 @@ var Cube = function Cube(order) {
       case 'y':
         dirAngle = direction === 'clockwise' ? 1 : -1;
 
-        var _loop3 = function _loop3(i) {
-          var _loop4 = function _loop4(j) {
+        var _loop4 = function _loop4(i) {
+          var _loop5 = function _loop5(j) {
             if (del) scene.remove(_this.blocks[i][index][j].piece); // Backing up
 
             if (!tempSclice['' + i + j]) tempSclice['' + i + j] = _this.blocks[i][index][j].piece;
@@ -368,12 +483,12 @@ var Cube = function Cube(order) {
           };
 
           for (var j = 0; j < _this.order; j++) {
-            _loop4(j);
+            _loop5(j);
           }
         };
 
         for (var i = 0; i < _this.order; i++) {
-          _loop3(i);
+          _loop4(i);
         }
 
         break;
@@ -381,8 +496,8 @@ var Cube = function Cube(order) {
       case 'z':
         dirAngle = direction === 'clockwise' ? 1 : -1;
 
-        var _loop5 = function _loop5(i) {
-          var _loop6 = function _loop6(j) {
+        var _loop6 = function _loop6(i) {
+          var _loop7 = function _loop7(j) {
             // scene.remove(this.blocks[i][j][index].piece);
             if (del) scene.remove(_this.blocks[i][j][index].piece); // Backing up
 
@@ -419,12 +534,12 @@ var Cube = function Cube(order) {
           };
 
           for (var j = 0; j < _this.order; j++) {
-            _loop6(j);
+            _loop7(j);
           }
         };
 
         for (var i = 0; i < _this.order; i++) {
-          _loop5(i);
+          _loop6(i);
         }
 
         break;

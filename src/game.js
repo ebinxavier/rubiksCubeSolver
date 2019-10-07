@@ -163,20 +163,92 @@ class Cube {
         },600);
     }
 
+    showCongrats = ()=>{
+        if(confirm("Congrats..! Do you want to shuffle?")) 
+        shuffle();
+    }
+
     mergeSlice = ({initial=false, data})=>{
         if(initial){
             this.mergeObj= [...data];
-        } else{
-            const newObj = [];
+        } else if(this.mergeObj){
+            let newObj = [];
             data.forEach((slice, i)=>{
                 if(slice.length==0) slice = ["1","1","1"];
                 newObj.push(slice.map((e,j)=>this.mergeObj[i][j] == e ? e : "0"));
             })
+            const expectedSum = data.reduce((a,e,i)=>a+i,'');
+            let valid = false;
+            for(let i=0;i<3;i++){ //x,y,z
+                let sum ="";
+                for(let j=0;j<data.length;j++){
+                    sum += newObj[j][i];
+                } 
+                if(expectedSum.split('').every(e=>sum.includes(e))){
+                    valid = true;
+                }
+            }
+            if(!valid){
+                newObj = false;
+            }
             this.mergeObj = newObj;
         }
     }
-
     checkGameStatus = ()=>{
+        // Check whether 3 sides are of same color.
+        if(this.alreadyWon) return false;
+        for(let i of [0, this.order-1]){
+            let initial = true;
+            for(let j=0;j<this.order;j++){
+                let data=[];
+                for(let k=0;k<this.order;k++){
+                    data.push(this.blocks[i][j][k].piece.name.split(''));
+                }
+                this.mergeSlice({initial, data });
+                initial = false;
+            }
+            if(!this.mergeObj){
+                // not won
+                return false;
+            }
+        }
+
+        for(let i of [0, this.order-1]){
+            let initial = true;
+            for(let j=0;j<this.order;j++){
+                let data=[];
+                for(let k=0;k<this.order;k++){
+                    data.push(this.blocks[j][k][i].piece.name.split(''));
+                }
+                this.mergeSlice({initial, data });
+                initial = false;
+            }
+            if(!this.mergeObj){
+                // not won
+                return false;
+            }
+        }
+
+        for(let i of [0, this.order-1]){
+            let initial = true;
+            for(let j=0;j<this.order;j++){
+                let data=[];
+                for(let k=0;k<this.order;k++){
+                    data.push(this.blocks[i][k][j].piece.name.split(''));
+                }
+                this.mergeSlice({initial, data });
+                initial = false;
+            }
+            if(!this.mergeObj){
+                // not won
+                return false;
+            }
+        }
+        this.alreadyWon = true;
+        return this.alreadyWon;
+    }
+
+    checkGameStatusold = ()=>{
         // // if(this.alreadyWon) return false;
         // for(let i=0;i<this.order;i++){
         //     for(let j=0;j<this.order;j++){
