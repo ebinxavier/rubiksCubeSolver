@@ -22,11 +22,13 @@
 	</head>
 	<body>
 		<script src="lib/three.js"></script>
-		
+		<script src="./lib/solver.js"></script>
 		<script src="lib/orbit.js"></script>
 		<script src="lib/Trackball.js"></script>
-        <script src="build/environment.js"></script>
-		<script src="build/game.js"></script>
+        <!-- <script src="build/environment.js"></script> -->
+        <script src="src/environment.js"></script>
+		<!-- <script src="build/game.js"></script> -->
+		<script src="src/game.js"></script>
 		<button id='btn'
 		style="position: absolute;
 				top: 0px;
@@ -38,6 +40,60 @@
 				color: white;
 				font-size: 20px;
 				border-radius: 7px;" 
-		onclick="shuffle()">SHUFFLE</button>
+		onclick="findSolution()">SOLVE</button>
+		<div class="colorPallet">
+			<div id="red" class="active" onclick="activateColor(this.id,0)"></div>
+			<div id="green" onclick="activateColor(this.id,1)"></div>
+			<div id="blue" onclick="activateColor(this.id,2)"></div>
+			<div id="yellow" onclick="activateColor(this.id,3)"></div>
+			<div id="orange" onclick="activateColor(this.id,4)"></div>
+			<div id="white" onclick="activateColor(this.id,5)"></div>
+		</div>
 	</body>
 </html>
+
+<style>
+ .colorPallet{
+	position: absolute;
+    top: 0;
+    display: flex;
+    right: 0;
+ }
+ .colorPallet div{
+	 width: 50px;
+	 height: 50px;
+	 margin: 10px;
+	 order: 1px solid;
+     box-shadow: 0 0 10px 1px;
+ }
+ #red{
+	background-color: red
+ }
+ #blue{
+	background-color: blue
+ }
+ #green{
+	background-color: #03e907
+ }
+ #orange{
+	background-color: orange
+ }
+ #yellow{
+	background-color: yellow
+ }
+ #white{
+	background-color: white
+ }
+ .active {
+	border: 3px solid gray;
+ }
+</style>
+
+<!-- let cubeState = [
+  'flulfbddr', // front
+  'rudrruddl', // right
+  'dbbburrfb', // up
+  'llffdrubf', // down
+  'rludlubrf', // left
+  'lubfbfudl' // back
+].join(''); -->

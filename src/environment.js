@@ -187,6 +187,16 @@ mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
 raycaster.setFromCamera(mouse, camera);
 const intersects = raycaster.intersectObjects(scene.children, true);
 
+if(cube.editMode && intersects.length){
+    intersect = intersects[0];
+    const {r,g,b} = intersect.object.material.color;
+    if(r<0.1 && g<0.1 && b<0.1 ){ // Meas black borders , not actual faces to be colored.
+        return;
+    }
+    intersect.object.material.color = new THREE.Color(cube.activeEditColor);
+    return;
+}
+
 if(intersects.length){
     controls.enabled = false;
     dragStart = intersects[0].point;

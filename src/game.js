@@ -12,6 +12,8 @@ class Cube {
         this.alreadyWon=false;
         this.shuffling=false;
         this.rotating = false;
+        this.editMode = true;
+        this.activeEditColor = 0xff0000;
         this.order=order;
         this.pieceSize=10;
         this.blocks=[];
@@ -164,8 +166,8 @@ class Cube {
     }
 
     showCongrats = ()=>{
-        if(confirm("Congrats..! Do you want to shuffle?")) 
-        shuffle();
+        // if(confirm("Congrats..! Do you want to shuffle?")) 
+        // shuffle();
     }
 
     mergeSlice = ({initial=false, data})=>{
@@ -248,37 +250,6 @@ class Cube {
         return this.alreadyWon;
     }
 
-    checkGameStatusold = ()=>{
-        // // if(this.alreadyWon) return false;
-        // for(let i=0;i<this.order;i++){
-        //     for(let j=0;j<this.order;j++){
-        //         let data=[];
-        //         for(let k=0;k<this.order;k++){
-        //             console.log(this.blocks[i][j][k].piece.name)
-        //            data.push(this.blocks[i][j][k].piece.name.split(''));
-        //         }
-        //         // const columnCounter = 0;
-        //         // for(let x in data){
-        //         //     const sum =0;
-        //         //     for(let y in data[x]){
-        //         //         sum +=Number(data[y][x] || '1');
-        //         //     }
-        //         //     if(sum/3 != data[0][x]) columnCounter++;
-        //         // }
-        //         // if(columnCounter>1) return false;
-        //         console.log("Row")
-        //         if(i===0 && j===0){
-        //             this.mergeSlice({initial:true, data })
-        //         } else{
-        //             this.mergeSlice({ data }) 
-        //         }
-        //     }
-        //     console.log("slice")
-        // }
-        // this.alreadyWon = 3 == this.mergeObj.reduce((final, slice)=>final+slice.reduce((total,e)=>Number(e)+total, 0),0);
-        // return this.alreadyWon;
-    }
-
     printSclice = (axis, index)=>{
         switch(axis){
             case 'x':
@@ -313,140 +284,218 @@ class Cube {
     
 
     rotateSclice = (axis, index, direction,del=false) => {
-        if(this.rotating) {
-            console.log("Already in one rotation...!");
-            return;
-        }
-        if(index>=this.order) 
-            throw new Error('Rotation not possible on this index : '+index+' because maximum size is : '+(this.order-1));
-        if('xyz'.indexOf(axis)==-1)
-        throw new Error('Rotation on invalid axis: '+axis);
-        let dirAngle;
-        let rotationAngleInterval =15;
-        const tempSclice = {};
-        this.rotating= true;
-        switch(axis){
-            case 'x':
-                dirAngle = direction==='clockwise'?1:-1;
-                for(let i=0;i<this.order;i++){
-                    for(let j=0;j<this.order;j++){
+        return new Promise((resolve, reject)=>{
+            if(this.editMode ) return;
+            if(this.rotating) {
+                console.log("Already in one rotation...!");
+                return;
+            }
+            if(index>=this.order) 
+                throw new Error('Rotation not possible on this index : '+index+' because maximum size is : '+(this.order-1));
+            if('xyz'.indexOf(axis)==-1)
+            throw new Error('Rotation on invalid axis: '+axis);
+            let dirAngle;
+            let rotationAngleInterval =15;
+            const tempSclice = {};
+            this.rotating= true;
+            switch(axis){
+                case 'x':
+                    dirAngle = direction==='clockwise'?1:-1;
+                    for(let i=0;i<this.order;i++){
+                        for(let j=0;j<this.order;j++){
 
-                        if(del)
-                        scene.remove(this.blocks[index][i][j].piece);
+                            if(del)
+                            scene.remove(this.blocks[index][i][j].piece);
 
-                        // Backing up
-                        if(!tempSclice[''+i+j])
-                        tempSclice[''+i+j]= this.blocks[index][i][j].piece;
+                            // Backing up
+                            if(!tempSclice[''+i+j])
+                            tempSclice[''+i+j]= this.blocks[index][i][j].piece;
 
-                        const {x,y} = this.rotationMatrixHelper(i,j,direction=='clockwise'?'':'clockwise');
-                        this.blocks[index][i][j].piece = tempSclice[''+x+y] || this.blocks[index][x][y].piece;
-                       
-                        let totalAngle = rotationAngleInterval;
-                        // let timer = setInterval(()=>{
-                        //     if(totalAngle==90) {
-                        //         this.rotating= false;
-                        //         clearInterval(timer);
-                        //     }
-                        //     const rotation = new THREE.Matrix4().makeRotationX(degree(rotationAngleInterval * dirAngle));
-                        //     this.blocks[index][i][j].piece.applyMatrix(rotation);
-                        //     totalAngle+=rotationAngleInterval;
-                        // },10)
+                            const {x,y} = this.rotationMatrixHelper(i,j,direction=='clockwise'?'':'clockwise');
+                            this.blocks[index][i][j].piece = tempSclice[''+x+y] || this.blocks[index][x][y].piece;
+                        
+                            let totalAngle = rotationAngleInterval;
 
-                        const doRotationAnimation = ()=> {
-                            if(totalAngle==90) {
-                                this.rotating= false;
-                            } else
-                            requestAnimationFrame( doRotationAnimation );
+                            const doRotationAnimation = ()=> {
+                                if(totalAngle==90) {
+                                    this.rotating= false;
+                                    setTimeout(()=>resolve("done"), 500);
+                                } else
+                                requestAnimationFrame( doRotationAnimation );
 
-                            const rotation = new THREE.Matrix4().makeRotationX(degree(rotationAngleInterval * dirAngle));
-                            this.blocks[index][i][j].piece.applyMatrix(rotation);
-                            totalAngle+=rotationAngleInterval;
-                            };
-                        doRotationAnimation();
-                    }
-                }
-            break;
-            case 'y':
-                dirAngle = direction==='clockwise'?1:-1;
-                for(let i=0;i<this.order;i++){
-                    for(let j=0;j<this.order;j++){
-                        if(del)
-                        scene.remove(this.blocks[i][index][j].piece);
-                        // Backing up
-                        if(!tempSclice[''+i+j])
-                        tempSclice[''+i+j]= this.blocks[i][index][j].piece;
-
-                        const {x,y} = this.rotationMatrixHelper(i,j,direction);
-                        this.blocks[i][index][j].piece = tempSclice[''+x+y] || this.blocks[x][index][y].piece;
-                       
-
-                        let totalAngle = rotationAngleInterval;
-                        // let timer = setInterval(()=>{
-                        //     if(totalAngle==90) {
-                        //         this.rotating= false;
-                        //         clearInterval(timer);
-                        //     }
-                        //     const rotation = new THREE.Matrix4().makeRotationY(degree(rotationAngleInterval * dirAngle));
-                        // this.blocks[i][index][j].piece.applyMatrix(rotation);
-                        //     totalAngle+=rotationAngleInterval;
-                        // },10)
-
-                        const doRotationAnimation = ()=> {
-                            if(totalAngle==90) {
-                                this.rotating= false;
-                            } else
-                            requestAnimationFrame( doRotationAnimation );
-
-                            const rotation = new THREE.Matrix4().makeRotationY(degree(rotationAngleInterval * dirAngle));
-                            this.blocks[i][index][j].piece.applyMatrix(rotation);
+                                const rotation = new THREE.Matrix4().makeRotationX(degree(rotationAngleInterval * dirAngle));
+                                this.blocks[index][i][j].piece.applyMatrix(rotation);
                                 totalAngle+=rotationAngleInterval;
-                            };
-                        doRotationAnimation();
-
+                                };
+                            doRotationAnimation();
+                        }
                     }
-                }
-            break;
-            case 'z':
-                dirAngle = direction==='clockwise'?1:-1;
-                for(let i=0;i<this.order;i++){
-                    for(let j=0;j<this.order;j++){
-                        // scene.remove(this.blocks[i][j][index].piece);
-                        if(del)
-                        scene.remove(this.blocks[i][j][index].piece);
-                        // Backing up
-                        if(!tempSclice[''+i+j])
-                        tempSclice[''+i+j]= this.blocks[i][j][index].piece;
+                break;
+                case 'y':
+                    dirAngle = direction==='clockwise'?1:-1;
+                    for(let i=0;i<this.order;i++){
+                        for(let j=0;j<this.order;j++){
+                            if(del)
+                            scene.remove(this.blocks[i][index][j].piece);
+                            // Backing up
+                            if(!tempSclice[''+i+j])
+                            tempSclice[''+i+j]= this.blocks[i][index][j].piece;
 
-                        const {x,y} = this.rotationMatrixHelper(i,j,direction=='clockwise'?'':'clockwise');
-                        this.blocks[i][j][index].piece = tempSclice[''+x+y] || this.blocks[x][y][index].piece;
+                            const {x,y} = this.rotationMatrixHelper(i,j,direction);
+                            this.blocks[i][index][j].piece = tempSclice[''+x+y] || this.blocks[x][index][y].piece;
                         
-                        
-                        let totalAngle = rotationAngleInterval;
-                        // let timer = setInterval(()=>{
-                        //     if(totalAngle==90) {
-                        //         this.rotating= false;
-                        //         clearInterval(timer);
-                        //     }
-                        //     const rotation = new THREE.Matrix4().makeRotationZ(degree(rotationAngleInterval*dirAngle));
-                        // this.blocks[i][j][index].piece.applyMatrix(rotation);
-                        //     totalAngle+=rotationAngleInterval;
-                        // },10)
 
-                        const doRotationAnimation = ()=> {
-                            if(totalAngle==90) {
-                                this.rotating= false;
-                            } else
-                            requestAnimationFrame( doRotationAnimation );
+                            let totalAngle = rotationAngleInterval;
 
-                            const rotation = new THREE.Matrix4().makeRotationZ(degree(rotationAngleInterval*dirAngle));
-                        this.blocks[i][j][index].piece.applyMatrix(rotation);
-                            totalAngle+=rotationAngleInterval;
-                            };
-                        doRotationAnimation();
+                            const doRotationAnimation = ()=> {
+                                if(totalAngle==90) {
+                                    this.rotating= false;
+                                    setTimeout(()=>resolve("done"), 500);
+                                } else
+                                requestAnimationFrame( doRotationAnimation );
+
+                                const rotation = new THREE.Matrix4().makeRotationY(degree(rotationAngleInterval * dirAngle));
+                                this.blocks[i][index][j].piece.applyMatrix(rotation);
+                                    totalAngle+=rotationAngleInterval;
+                                };
+                            doRotationAnimation();
+
+                        }
                     }
-                }
-            break;
+                break;
+                case 'z':
+                    dirAngle = direction==='clockwise'?1:-1;
+                    for(let i=0;i<this.order;i++){
+                        for(let j=0;j<this.order;j++){
+                            // scene.remove(this.blocks[i][j][index].piece);
+                            if(del)
+                            scene.remove(this.blocks[i][j][index].piece);
+                            // Backing up
+                            if(!tempSclice[''+i+j])
+                            tempSclice[''+i+j]= this.blocks[i][j][index].piece;
+
+                            const {x,y} = this.rotationMatrixHelper(i,j,direction=='clockwise'?'':'clockwise');
+                            this.blocks[i][j][index].piece = tempSclice[''+x+y] || this.blocks[x][y][index].piece;
+                            
+                            
+                            let totalAngle = rotationAngleInterval;
+
+                            const doRotationAnimation = ()=> {
+                                if(totalAngle==90) {
+                                    this.rotating= false;
+                                    setTimeout(()=>resolve("done"), 500);
+                                } else
+                                requestAnimationFrame( doRotationAnimation );
+
+                                const rotation = new THREE.Matrix4().makeRotationZ(degree(rotationAngleInterval*dirAngle));
+                            this.blocks[i][j][index].piece.applyMatrix(rotation);
+                                totalAngle+=rotationAngleInterval;
+                                };
+                            doRotationAnimation();
+                        }
+                    }
+                break;
+            }
+        })
+    }
+
+    rotate = (notation)=>{
+        // Front: Red
+        // Top: White
+        // Left: Green
+        const mapping ={
+            'U': ()=>cube.rotateSclice('y',2,'anticlockwise'),
+            'Uprime': ()=>cube.rotateSclice('y',2,'clockwise'),
+            'D':()=>cube.rotateSclice('y',0,'clockwise'),
+            'Dprime':()=>cube.rotateSclice('y',0,'anticlockwise'),
+            'R':()=>cube.rotateSclice('z',0,'clockwise'),
+            'Rprime':()=>cube.rotateSclice('z',0,'anticlockwise'),
+            'L':()=>cube.rotateSclice('z',2,'anticlockwise'),
+            'Lprime':()=>cube.rotateSclice('z',2,'clockwise'),
+            'F':()=>cube.rotateSclice('x',2,'anticlockwise'),
+            'Fprime':()=>cube.rotateSclice('x',2,'clockwise'),
+            'B':()=>cube.rotateSclice('x',0,'clockwise'),
+            'Bprime':()=>cube.rotateSclice('x',0,'anticlockwise'),
+            'M':()=>cube.rotateSclice('z',1,'anticlockwise'),
+            'Mprime':()=>cube.rotateSclice('z',1,'clockwise'),
+            'E':()=>cube.rotateSclice('y',1,'clockwise'),
+            'Eprime':()=>cube.rotateSclice('y',1,'anticlockwise'),
+            'S':()=>cube.rotateSclice('x',1,'anticlockwise'),
+            'Sprime':()=>cube.rotateSclice('x',1,'clockwise'),
+
         }
+        try{
+        return mapping[notation];
+        } catch(e){
+            console.error('Invalid notation', e);
+            console.log("step:",notation);
+        }
+    }
+
+    getNormal = (obj)=>{
+        const normalMatrix = new THREE.Matrix3().getNormalMatrix( obj.matrixWorld );
+        return obj.geometry.faces[1].normal.clone().applyMatrix3( normalMatrix ).normalize();
+    }
+
+    getState = ()=>{
+        const F = {faces: ["222","221","220","212","211","210","202","201","200"], normal: {x:1,y:0,z:0}};
+        const R = {faces: ["220","120","020","210","110","010","200","100","000"], normal: {x:0,y:0,z:1}};
+        const U = {faces: ["022","021","020","122","121","120","222","221","220"], normal: {x:0, y:-1,z:0}};
+        const D = {faces: ["202","201","200","102","101","100","002","001","000"], normal: {x:0, y:-1,z:0}};
+        const L = {faces: ["022","122","222","012","112","212","002","102","202"], normal: {x:0,y:0,z:1}};
+        const B = {faces: ["020","021","022","010","011","012","000","001","002"], normal: {x:1,y:0,z:0}};
+
+
+        const [fSide,rSide,uSide,dSide,lSide,bSide] = [{face:"211",normal:{x:1,y:0,z:0}},
+        {face:"110",normal:{x:0,y:0,z:1}},
+        {face:"121",normal:{x:0,y:-1,z:0}},
+        {face:"101",normal:{x:0,y:-1,z:0}},
+        {face:"112",normal:{x:0,y:0,z:1}},
+        {face:"011",normal:{x:1,y:0,z:0}}]
+            .map((dimension, i)=>{
+                            const [x,y,z] = dimension.face.split("");
+                            const children = cube.blocks[x][y][z].piece.children;
+                            let color;
+                            children.forEach(child=>{
+                                const {x,y,z} = cube.getNormal(child);
+                                if(Math.round(x) ===  dimension.normal.x && Math.round(y) ===  dimension.normal.y && Math.round(z) ===  dimension.normal.z){
+                                    const {r,g,b} = child.material.color;
+                                    if(r<0.1 && g<0.1 && b<0.1 ){ // Meas black borders , not actual faces to be colored.
+                                        return;
+                                    }
+                                    color = child.material.color.getHex();
+                                }
+                            })
+                            return color
+                        })
+        let state ="";
+        [F,R,U,D,L,B].forEach(side=>{
+            side.faces.forEach((dimension, i)=>{
+                const [x,y,z] = dimension.split("");
+                const children = cube.blocks[x][y][z].piece.children;
+                children.forEach(child=>{
+                    const {x,y,z} = this.getNormal(child);
+                    if(Math.round(x) ===  side.normal.x && Math.round(y) ===  side.normal.y && Math.round(z) ===  side.normal.z){
+                        const {r,g,b} = child.material.color;
+                        if(r<0.1 && g<0.1 && b<0.1 ){ // Meas black borders , not actual faces to be colored.
+                            return;
+                        }
+                        switch(child.material.color.getHex()){
+                            case fSide: state+='f';break;
+                            case rSide: state+='r';break;
+                            case uSide: state+='u';break;
+                            case dSide: state+='d';break;
+                            case lSide: state+='l';break;
+                            case bSide: state+='b';break;
+                        }
+                    }
+                })
+            })
+            // setTimeout(()=>{
+            //     scene.remove(cube.blocks[x][y][z].piece);
+            // }, i*100);
+        })
+        return state;
     }
 }
 
@@ -462,4 +511,56 @@ let cube = new Cube(query.order || 3);
 
 function shuffle(){
     cube.shuffle(query.shuffle);
+}
+
+
+activateColor = (id, index)=>{
+    Array.from(document.getElementsByClassName('active')).forEach(item=>{
+        item.className='';
+    })
+    document.getElementById(id).className='active';
+    cube.activeEditColor = cube.colors[index];
+}
+
+findSolution = async ()=>{
+    try{
+        const replacer = {
+            f: "F S",
+            r: "R Mprime",
+            u: "U Eprime",
+            d: "D E",
+            l: "L M",
+            b: "B Sprime",
+            fprime: "Fprime Sprime",
+            rprime: "Rprime M",
+            uprime: "Uprime E",
+            dprime: "Dprime Eprime",
+            lprime: "Lprime Mprime",
+            bprime: "Bprime S"
+
+        }
+        const stepsInitial = window.rubiksCubeSolver(cube.getState());
+        const steps = stepsInitial.split('2').map(item=>{
+            if(!item) return ''
+            const actions = item.split(' ');
+            actions.push(actions[actions.length - 1])
+            return actions.join(' ');
+        }).join('');
+        const stepsReplaced = steps.split(' ').map(step=>{
+            return replacer[step] || step;
+        }).join(' ')
+        if(!stepsReplaced) {
+            alert("Already in solved state!");
+            return;
+        }
+        cube.editMode = false;
+        const finalSteps = stepsReplaced.split(' ');
+        for(let i=0; i<finalSteps.length; i++){
+            const data = await cube.rotate(finalSteps[i])();
+            console.log(data);
+        }
+    } catch (e){
+        alert("Unable to solve. Please make sure that you colored the cube properly!")
+        console.log('e', e);
+    }
 }
