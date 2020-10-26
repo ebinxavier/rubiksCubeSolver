@@ -514,7 +514,7 @@ function shuffle(){
 }
 
 
-activateColor = (id, index)=>{
+const activateColor = (id, index)=>{
     Array.from(document.getElementsByClassName('active')).forEach(item=>{
         item.className='';
     })
@@ -522,7 +522,7 @@ activateColor = (id, index)=>{
     cube.activeEditColor = cube.colors[index];
 }
 
-findSolution = async ()=>{
+const findSolution = async ()=>{
     try{
         const replacer = {
             f: "F S",
@@ -540,6 +540,7 @@ findSolution = async ()=>{
 
         }
         const stepsInitial = window.rubiksCubeSolver(cube.getState());
+        console.log("stepsInitial",stepsInitial);
         const steps = stepsInitial.split('2').map(item=>{
             if(!item) return ''
             const actions = item.split(' ');
@@ -553,6 +554,7 @@ findSolution = async ()=>{
             alert("Already in solved state!");
             return;
         }
+        console.log('stepsReplaced', stepsReplaced)
         cube.editMode = false;
         const finalSteps = stepsReplaced.split(' ');
         for(let i=0; i<finalSteps.length; i++){

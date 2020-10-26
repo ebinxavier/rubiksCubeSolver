@@ -54,9 +54,9 @@ window.addEventListener('touchmove',touchMove);
 window.addEventListener('touchend',touchEnd);
 }
 const scene = new THREE.Scene();
-scene.background = new THREE.Color( 0x555588 );
+scene.background = new THREE.Color( 0x222222 );
 const camera = new THREE.PerspectiveCamera( 40, window.innerWidth/window.innerHeight, 0.1, 400 );
-camera.position.z = 80;
+camera.position.z = 150;
 
 const renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.setSize( window.innerWidth, window.innerHeight );
@@ -99,7 +99,7 @@ controls.keys = [ 65, 83, 68 ];
 controls.mouseButtons={LEFT:0,RIGHT:2};
 controls.noPan=true;
 
-camera.position.set( 50,50,50);
+camera.position.set( 70,70,70);
 
 if(isMobile)
 controls.enabled = false;
@@ -188,7 +188,7 @@ raycaster.setFromCamera(mouse, camera);
 const intersects = raycaster.intersectObjects(scene.children, true);
 
 if(cube.editMode && intersects.length){
-    intersect = intersects[0];
+    const intersect = intersects[0];
     const {r,g,b} = intersect.object.material.color;
     if(r<0.1 && g<0.1 && b<0.1 ){ // Meas black borders , not actual faces to be colored.
         return;
