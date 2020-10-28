@@ -822,7 +822,7 @@ var activateColor = function activateColor(id, index) {
 
 var findSolution = function () {
   var _ref2 = _asyncToGenerator(regeneratorRuntime.mark(function _callee() {
-    var replacer, stepsInitial, steps, stepsReplaced, finalSteps, i, data;
+    var replacer, stepsInitial, steps, stepsReplaced, finalSteps;
     return regeneratorRuntime.wrap(function _callee$(_context) {
       while (1) {
         switch (_context.prev = _context.next) {
@@ -842,67 +842,187 @@ var findSolution = function () {
               lprime: "Lprime Mprime",
               bprime: "Bprime S"
             };
+            console.log("cube.getState()", cube.getState());
             stepsInitial = window.rubiksCubeSolver(cube.getState());
-            steps = stepsInitial.split('2').map(function (item) {
-              if (!item) return '';
-              var actions = item.split(' ');
-              actions.push(actions[actions.length - 1]);
-              return actions.join(' ');
-            }).join('');
-            stepsReplaced = steps.split(' ').map(function (step) {
+            steps = [];
+            stepsInitial.split(' ').forEach(function (step) {
+              if (step.slice(-1) === '2') {
+                steps.push(step.slice(0, -1));
+                steps.push(step.slice(0, -1));
+              } else steps.push(step);
+            });
+            stepsReplaced = steps.map(function (step) {
               return replacer[step] || step;
             }).join(' ');
 
             if (stepsReplaced) {
-              _context.next = 8;
+              _context.next = 10;
               break;
             }
 
             alert("Already in solved state!");
             return _context.abrupt("return");
 
-          case 8:
+          case 10:
+            console.log('stepsReplaced', stepsReplaced);
             cube.editMode = false;
+            Array.from(document.getElementsByClassName("hideOnSolve")).forEach(function (e) {
+              return e.style.display = "none";
+            });
+            Array.from(document.getElementsByClassName("showOnSolve")).forEach(function (e) {
+              return e.style.display = "unset";
+            });
             finalSteps = stepsReplaced.split(' ');
-            i = 0;
-
-          case 11:
-            if (!(i < finalSteps.length)) {
-              _context.next = 19;
-              break;
-            }
-
-            _context.next = 14;
-            return cube.rotate(finalSteps[i])();
-
-          case 14:
-            data = _context.sent;
-            console.log(data);
-
-          case 16:
-            i++;
-            _context.next = 11;
+            window.solved = finalSteps;
+            console.log("Solved!!!");
+            _context.next = 23;
             break;
 
           case 19:
-            _context.next = 25;
-            break;
-
-          case 21:
-            _context.prev = 21;
+            _context.prev = 19;
             _context.t0 = _context["catch"](0);
             alert("Unable to solve. Please make sure that you colored the cube properly!");
             console.log('e', _context.t0);
 
-          case 25:
+          case 23:
           case "end":
             return _context.stop();
         }
       }
-    }, _callee, null, [[0, 21]]);
+    }, _callee, null, [[0, 19]]);
   }));
 
   return function findSolution() {
     return _ref2.apply(this, arguments);
+  };
+}();
+
+window.isPause = true;
+
+var pause = function pause() {
+  window.isPause = true;
+  Array.from(document.getElementsByClassName("hideOnPlay")).forEach(function (e) {
+    return e.style.display = "unset";
+  });
+  Array.from(document.getElementsByClassName("showOnPlay")).forEach(function (e) {
+    return e.style.display = "none";
+  });
+};
+
+var play = function () {
+  var _ref3 = _asyncToGenerator(regeneratorRuntime.mark(function _callee2() {
+    var finalSteps, i, data;
+    return regeneratorRuntime.wrap(function _callee2$(_context2) {
+      while (1) {
+        switch (_context2.prev = _context2.next) {
+          case 0:
+            if (window.isPause) {
+              _context2.next = 3;
+              break;
+            }
+
+            pause();
+            return _context2.abrupt("return");
+
+          case 3:
+            ;
+            Array.from(document.getElementsByClassName("hideOnPlay")).forEach(function (e) {
+              return e.style.display = "none";
+            });
+            Array.from(document.getElementsByClassName("showOnPlay")).forEach(function (e) {
+              return e.style.display = "unset";
+            });
+            window.isPause = false;
+            finalSteps = window.solved;
+            i = window.currentStep || 0;
+
+          case 9:
+            if (!(i < finalSteps.length)) {
+              _context2.next = 21;
+              break;
+            }
+
+            window.currentStep = i;
+
+            if (!window.isPause) {
+              _context2.next = 13;
+              break;
+            }
+
+            return _context2.abrupt("return");
+
+          case 13:
+            _context2.next = 15;
+            return cube.rotate(finalSteps[i])();
+
+          case 15:
+            data = _context2.sent;
+            console.log(i, finalSteps[i], data);
+            window.prevDir = 1;
+
+          case 18:
+            i++;
+            _context2.next = 9;
+            break;
+
+          case 21:
+            pause();
+
+          case 22:
+          case "end":
+            return _context2.stop();
+        }
+      }
+    }, _callee2);
+  }));
+
+  return function play() {
+    return _ref3.apply(this, arguments);
+  };
+}();
+
+var getInverse = function getInverse(move) {
+  if (move.includes('prime')) return move.split('prime')[0];
+  return move + 'prime';
+};
+
+window.prevDir = -1;
+
+var oneMove = function () {
+  var _ref4 = _asyncToGenerator(regeneratorRuntime.mark(function _callee3(dir) {
+    var i, finalSteps, step;
+    return regeneratorRuntime.wrap(function _callee3$(_context3) {
+      while (1) {
+        switch (_context3.prev = _context3.next) {
+          case 0:
+            i = (window.currentStep || 0) + dir + (dir !== window.prevDir ? window.prevDir : 0);
+
+            if (!(i < 0 || i >= window.solved.length || !window.isPause)) {
+              _context3.next = 4;
+              break;
+            }
+
+            console.log("Operation not allowed!!");
+            return _context3.abrupt("return");
+
+          case 4:
+            window.currentStep = i;
+            window.prevDir = dir;
+            finalSteps = window.solved;
+            step = dir === -1 ? getInverse(finalSteps[i]) : finalSteps[i];
+            console.log(i, finalSteps[i], step);
+            _context3.next = 11;
+            return cube.rotate(step)();
+
+          case 11:
+          case "end":
+            return _context3.stop();
+        }
+      }
+    }, _callee3);
+  }));
+
+  return function oneMove(_x) {
+    return _ref4.apply(this, arguments);
   };
 }();

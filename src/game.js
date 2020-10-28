@@ -539,15 +539,16 @@ const findSolution = async ()=>{
             bprime: "Bprime S"
 
         }
+        console.log("cube.getState()",cube.getState());
         const stepsInitial = window.rubiksCubeSolver(cube.getState());
-        console.log("stepsInitial",stepsInitial);
-        const steps = stepsInitial.split('2').map(item=>{
-            if(!item) return ''
-            const actions = item.split(' ');
-            actions.push(actions[actions.length - 1])
-            return actions.join(' ');
-        }).join('');
-        const stepsReplaced = steps.split(' ').map(step=>{
+        const steps=[];
+        stepsInitial.split(' ').forEach(step=>{
+            if(step.slice(-1)=== '2'){
+                steps.push(step.slice(0,-1));
+                steps.push(step.slice(0,-1));
+            } else steps.push(step);
+        })
+        const stepsReplaced = steps.map(step=>{
             return replacer[step] || step;
         }).join(' ')
         if(!stepsReplaced) {
@@ -556,13 +557,63 @@ const findSolution = async ()=>{
         }
         console.log('stepsReplaced', stepsReplaced)
         cube.editMode = false;
+        Array.from(document.getElementsByClassName("hideOnSolve")).forEach(e=>e.style.display="none");
+        Array.from(document.getElementsByClassName("showOnSolve")).forEach(e=>e.style.display="unset");
         const finalSteps = stepsReplaced.split(' ');
-        for(let i=0; i<finalSteps.length; i++){
-            const data = await cube.rotate(finalSteps[i])();
-            console.log(data);
-        }
+        // for(let i=0; i<finalSteps.length; i++){
+        //     const data = await cube.rotate(finalSteps[i])();
+        //     console.log(finalSteps[i], data);
+        // }
+        window.solved=finalSteps;
+        // cube.editMode = true;
+        console.log("Solved!!!")
     } catch (e){
         alert("Unable to solve. Please make sure that you colored the cube properly!")
         console.log('e', e);
     }
+}
+window.isPause=true;
+const pause = () => {
+    window.isPause=true;
+    Array.from(document.getElementsByClassName("hideOnPlay")).forEach(e=>e.style.display="unset");
+    Array.from(document.getElementsByClassName("showOnPlay")).forEach(e=>e.style.display="none");
+    
+}
+const play = async () => {
+    if(!window.isPause) {
+        pause();
+        return;
+    };
+    Array.from(document.getElementsByClassName("hideOnPlay")).forEach(e=>e.style.display="none");
+    Array.from(document.getElementsByClassName("showOnPlay")).forEach(e=>e.style.display="unset");
+    
+    window.isPause=false;
+    const finalSteps = window.solved;
+    for(let i=window.currentStep  || 0; i<finalSteps.length; i++){
+        window.currentStep = i;
+        if(window.isPause) return;
+        const data = await cube.rotate(finalSteps[i])();
+        console.log(i, finalSteps[i], data);
+        window.prevDir=1;
+    }
+    // cube.editMode = true;
+    pause();
+}
+const getInverse = (move) => {
+    if(move.includes('prime')) return move.split('prime')[0];
+    return move+'prime'
+}
+window.prevDir=-1;
+const oneMove = async (dir) => {
+    let i= (window.currentStep  || 0) + dir + (dir!==window.prevDir ?window.prevDir:0 );
+    if(i<0 || i>= window.solved.length || !window.isPause){
+        console.log("Operation not allowed!!");
+        return;
+    }
+    window.currentStep = i;
+    window.prevDir=dir;
+    const finalSteps = window.solved;
+    const step = dir === -1 ? getInverse(finalSteps[i]) : finalSteps[i];
+    console.log(i, finalSteps[i], step);
+    await cube.rotate(step)();
 }

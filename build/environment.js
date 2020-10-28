@@ -50,9 +50,9 @@ if (!isMobile) {
 }
 
 var scene = new THREE.Scene();
-scene.background = new THREE.Color(0x555588);
+scene.background = new THREE.Color(0x222222);
 var camera = new THREE.PerspectiveCamera(40, window.innerWidth / window.innerHeight, 0.1, 400);
-camera.position.z = 80;
+camera.position.z = 150;
 var renderer = new THREE.WebGLRenderer({
   antialias: true
 });
@@ -73,7 +73,7 @@ controls.mouseButtons = {
   RIGHT: 2
 };
 controls.noPan = true;
-camera.position.set(50, 50, 50);
+camera.position.set(70, 70, 70);
 if (isMobile) controls.enabled = false;
 renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;

@@ -10,15 +10,14 @@
 			body { margin: 0; }
 			canvas { width: 100%; height: 100% }
 		</style>
-		<!-- Global site tag (gtag.js) - Google Analytics -->
-		<script async src="https://www.googletagmanager.com/gtag/js?id=UA-148032432-1"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" integrity="sha512-+4zCK9k+qNFUR5X+cKL9EIR+ZOhtIloNl9GIKS57V1MyNsYpYcUrUeQc9vNfzsWfV28IaLL3i96P9sdNyeRssA==" crossorigin="anonymous" />		<!-- <script async src="https://www.googletagmanager.com/gtag/js?id=UA-148032432-1"></script>
 		<script>
 		window.dataLayer = window.dataLayer || [];
 		function gtag(){dataLayer.push(arguments);}
 		gtag('js', new Date());
 
 		gtag('config', 'UA-148032432-1');
-		</script>
+		</script> -->
 	</head>
 	<body>
 		<script src="lib/polyfill.min.js"></script>
@@ -31,9 +30,31 @@
 		<!-- <script src="build/game.js"></script> -->
 		<script src="src/game.js"></script>
 		<button id='btn'
-		class="solveBtn"
-		onclick="findSolution()">SOLVE</button>
-		<div class="colorPallet">
+		class="buttonCls hideOnSolve"
+		onclick="findSolution()">SOLVE
+		</button>
+		<button id='prev'
+			class="buttonCls prev showOnSolve"
+			onclick="oneMove(-1)">
+			<i class="fas fa-step-backward"></i>
+		</button>
+		<button id='play'
+			class="buttonCls showOnSolve" 
+			onclick="play()">
+			<i class="hideOnPlay fas fa-play"></i>
+			<i class="showOnPlay fas fa-pause"></i>
+		</button>
+		<button id='next'
+			class="buttonCls showOnSolve"
+			onclick="oneMove(1)">
+			<i class="fas fa-step-forward"></i>
+		</button>
+		<button id='reset'
+		class="buttonCls showOnSolve"
+		onclick="window.location.reload(false); ">
+		<i class="fas fa-redo-alt"></i>
+		</button>
+		<div class="colorPallet hideOnSolve">
 			<div id="red" class="active" onclick="activateColor(this.id,0)"></div>
 			<div id="green" onclick="activateColor(this.id,1)"></div>
 			<div id="blue" onclick="activateColor(this.id,2)"></div>
@@ -43,6 +64,7 @@
 		</div>
 	</body>
 </html>
+
 
 <style>
  .colorPallet{
@@ -58,12 +80,12 @@
 	 order: 1px solid;
      box-shadow: 0 0 10px 1px;
  }
- .solveBtn {
+ .buttonCls {
 	position: absolute;
     top: 0px;
     left: 0px;
     margin: 10px;
-    width: 200px;
+    width: 50px;
     height: 30px;
     background-color: #1b1b1b;
     color: white;
@@ -71,6 +93,24 @@
     border-radius: 7px;
     border: 1px solid;
     cursor: pointer;
+ }
+ #btn {
+	 width: 150px;
+ }
+ #play{
+	 left: 80px;
+ }
+ #next{
+	 left: 160px;
+ }
+ #reset{
+	left: 240px;
+ }
+ .showOnSolve{
+	 display: none;
+ }
+ .showOnPlay{
+	display: none;
  }
  .solveBtn:focus {
 	 outline: none;
