@@ -990,11 +990,12 @@ var oneMove = function () {
             window.prevDir = dir;
             finalSteps = window.solved;
             step = dir === -1 ? getInverse(finalSteps[i]) : finalSteps[i];
-            console.log(i, finalSteps[i], step);
-            _context3.next = 11;
+            console.log(i + 1, step);
+            document.getElementById("current-step").innerText = i + 1 > 0 ? "Step #" + (Number(i) + 1) + ' ( ' + step.replace('prime', " '") + ' )' : '';
+            _context3.next = 12;
             return cube.rotate(step)();
 
-          case 11:
+          case 12:
           case "end":
             return _context3.stop();
         }
