@@ -54,6 +54,7 @@
 		onclick="window.location.reload(false); ">
 		<i class="fas fa-redo-alt"></i>
 		</button>
+		<span id="message" class="textCls showOnSolve">Can be solved in N steps</span>
 		<div class="colorPallet hideOnSolve">
 			<div id="red" class="active" onclick="activateColor(this.id,0)"></div>
 			<div id="green" onclick="activateColor(this.id,1)"></div>
@@ -93,6 +94,15 @@
     border-radius: 7px;
     border: 1px solid;
     cursor: pointer;
+ }
+ .textCls {
+	position: absolute;
+    top: 50px;
+    left: 0px;
+    margin: 10px;
+    height: 30px;
+    color: white;
+    font-size: 20px;
  }
  #btn {
 	 width: 150px;

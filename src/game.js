@@ -566,6 +566,7 @@ const findSolution = async ()=>{
         // }
         window.solved=finalSteps;
         // cube.editMode = true;
+        document.getElementById("message").innerText="Can be solved in "+finalSteps.length+" steps!"
         console.log("Solved!!!")
     } catch (e){
         alert("Unable to solve. Please make sure that you colored the cube properly!")
