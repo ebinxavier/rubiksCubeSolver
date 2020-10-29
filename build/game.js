@@ -874,22 +874,23 @@ var findSolution = function () {
             });
             finalSteps = stepsReplaced.split(' ');
             window.solved = finalSteps;
+            document.getElementById("message").innerText = "Can be solved in " + finalSteps.length + " steps!";
             console.log("Solved!!!");
-            _context.next = 23;
+            _context.next = 24;
             break;
 
-          case 19:
-            _context.prev = 19;
+          case 20:
+            _context.prev = 20;
             _context.t0 = _context["catch"](0);
             alert("Unable to solve. Please make sure that you colored the cube properly!");
             console.log('e', _context.t0);
 
-          case 23:
+          case 24:
           case "end":
             return _context.stop();
         }
       }
-    }, _callee, null, [[0, 19]]);
+    }, _callee, null, [[0, 20]]);
   }));
 
   return function findSolution() {
@@ -989,11 +990,12 @@ var oneMove = function () {
             window.prevDir = dir;
             finalSteps = window.solved;
             step = dir === -1 ? getInverse(finalSteps[i]) : finalSteps[i];
-            console.log(i, finalSteps[i], step);
-            _context3.next = 11;
+            console.log(i + 1, step);
+            document.getElementById("current-step").innerText = i + 1 > 0 ? "Step #" + (Number(i) + 1) + ' ( ' + step.replace('prime', " '") + ' )' : '';
+            _context3.next = 12;
             return cube.rotate(step)();
 
-          case 11:
+          case 12:
           case "end":
             return _context3.stop();
         }

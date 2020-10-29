@@ -616,10 +616,13 @@ const oneMove = async (dir) => {
         return;
     }
     window.currentStep = i;
+
     window.prevDir=dir;
     const finalSteps = window.solved;
     const step = dir === -1 ? getInverse(finalSteps[i]) : finalSteps[i];
-    console.log(i, finalSteps[i], step);
+    console.log(i+1, step);
+    document.getElementById("current-step").innerText=(i+1>0?"Step #"+(Number(i)+1)+' ( '+step.replace('prime'," '")+' )':'');
+
     await cube.rotate(step)();
 }
 

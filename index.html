@@ -55,6 +55,7 @@
 		<i class="fas fa-redo-alt"></i>
 		</button>
 		<span id="message" class="textCls showOnSolve">Can be solved in N steps</span>
+		<span id="current-step" class="textCls showOnSolve">Step #1</span>
 		<div class="colorPallet hideOnSolve">
 			<div id="red" class="active" onclick="activateColor(this.id,0)"></div>
 			<div id="green" onclick="activateColor(this.id,1)"></div>
@@ -103,6 +104,9 @@
     height: 30px;
     color: white;
     font-size: 20px;
+ }
+ #current-step{
+	 top:80px
  }
  #btn {
 	 width: 150px;
