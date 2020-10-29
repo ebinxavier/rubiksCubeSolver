@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html>
+	<style>
+	html, body {margin: 0; height: 100%; overflow: hidden}
+	</style>
+	<head>
+		<meta charset=utf-8>
+		<title>Rubics Cube</title>
+		<style>
+			body { margin: 0; }
+			canvas { width: 100%; height: 100% }
+		</style>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" integrity="sha512-+4zCK9k+qNFUR5X+cKL9EIR+ZOhtIloNl9GIKS57V1MyNsYpYcUrUeQc9vNfzsWfV28IaLL3i96P9sdNyeRssA==" crossorigin="anonymous" />		<!-- <script async src="https://www.googletagmanager.com/gtag/js?id=UA-148032432-1"></script>
+		<script>
+		window.dataLayer = window.dataLayer || [];
+		function gtag(){dataLayer.push(arguments);}
+		gtag('js', new Date());
+
+		gtag('config', 'UA-148032432-1');
+		</script> -->
+	</head>
+	<body>
+		<script src="lib/polyfill.min.js"></script>
+		<script src="lib/three.js"></script>
+		<script src="./lib/solver.js"></script>
+		<script src="lib/orbit.js"></script>
+		<script src="lib/Trackball.js"></script>
+        <!-- <script src="build/environment.js"></script> -->
+        <script src="environment.js"></script>
+		<!-- <script src="build/game.js"></script> -->
+		<script src="game.js"></script>
+		<button id='btn'
+		class="buttonCls hideOnSolve"
+		onclick="findSolution()">SOLVE
+		</button>
+		<button id='prev'
+			class="buttonCls prev showOnSolve"
+			onclick="handlePrevNext(-1)">
+			<i class="fas fa-step-backward"></i>
+		</button>
+		<button id='play'
+			class="buttonCls showOnSolve" 
+			onclick="play()">
+			<i class="hideOnPlay fas fa-play"></i>
+			<i class="showOnPlay fas fa-pause"></i>
+		</button>
+		<button id='next'
+			class="buttonCls showOnSolve"
+			onclick="handlePrevNext(1)">
+			<i class="fas fa-step-forward"></i>
+		</button>
+		<button id='reset'
+		class="buttonCls showOnSolve"
+		onclick="window.location.reload(false); ">
+		<i class="fas fa-redo-alt"></i>
+		</button>
+		<span id="message" class="textCls showOnSolve">Can be solved in N steps</span>
+		<span id="current-step" class="textCls showOnSolve">Step #1</span>
+		<div class="colorPallet hideOnSolve">
+			<div id="red" class="active" onclick="activateColor(this.id,0)"></div>
+			<div id="green" onclick="activateColor(this.id,1)"></div>
+			<div id="blue" onclick="activateColor(this.id,2)"></div>
+			<div id="yellow" onclick="activateColor(this.id,3)"></div>
+			<div id="orange" onclick="activateColor(this.id,4)"></div>
+			<div id="white" onclick="activateColor(this.id,5)"></div>
+		</div>
+	</body>
+</html>
+
+
+<style>
+ .colorPallet{
+	position: absolute;
+    top: 0;
+    display: flex;
+    right: 0;
+ }
+ .colorPallet div{
+	 width: 50px;
+	 height: 50px;
+	 margin: 10px;
+	 order: 1px solid;
+     box-shadow: 0 0 10px 1px;
+ }
+ .buttonCls {
+	position: absolute;
+    top: 0px;
+    left: 0px;
+    margin: 10px;
+    width: 50px;
+    height: 30px;
+    background-color: #1b1b1b;
+    color: white;
+    font-size: 20px;
+    border-radius: 7px;
+    border: 1px solid;
+    cursor: pointer;
+ }
+ .textCls {
+	position: absolute;
+    top: 50px;
+    left: 0px;
+    margin: 10px;
+    height: 30px;
+    color: white;
+    font-size: 20px;
+ }
+ #current-step{
+	 top:80px
+ }
+ #btn {
+	 width: 150px;
+ }
+ #play{
+	 left: 80px;
+ }
+ #next{
+	 left: 160px;
+ }
+ #reset{
+	left: 240px;
+ }
+ .showOnSolve{
+	 display: none;
+ }
+ .showOnPlay{
+	display: none;
+ }
+ .solveBtn:focus {
+	 outline: none;
+ }
+ .solveBtn:hover {
+	background-color: #2b2b2b;
+ }
+ #red{
+	background-color: red
+ }
+ #blue{
+	background-color: blue
+ }
+ #green{
+	background-color: #03e907
+ }
+ #orange{
+	background-color: orange
+ }
+ #yellow{
+	background-color: yellow
+ }
+ #white{
+	background-color: white
+ }
+ .active {
+	border: 3px solid gray;
+ }
+</style>
+
+<!-- let cubeState = [
+  'flulfbddr', // front
+  'rudrruddl', // right
+  'dbbburrfb', // up
+  'llffdrubf', // down
+  'rludlubrf', // left
+  'lubfbfudl' // back
+].join(''); -->
