@@ -874,22 +874,23 @@ var findSolution = function () {
             });
             finalSteps = stepsReplaced.split(' ');
             window.solved = finalSteps;
+            document.getElementById("message").innerText = "Can be solved in " + finalSteps.length + " steps!";
             console.log("Solved!!!");
-            _context.next = 23;
+            _context.next = 24;
             break;
 
-          case 19:
-            _context.prev = 19;
+          case 20:
+            _context.prev = 20;
             _context.t0 = _context["catch"](0);
             alert("Unable to solve. Please make sure that you colored the cube properly!");
             console.log('e', _context.t0);
 
-          case 23:
+          case 24:
           case "end":
             return _context.stop();
         }
       }
-    }, _callee, null, [[0, 19]]);
+    }, _callee, null, [[0, 20]]);
   }));
 
   return function findSolution() {
