@@ -361,7 +361,7 @@ var Cube = function Cube(order) {
       if (index >= _this.order) throw new Error('Rotation not possible on this index : ' + index + ' because maximum size is : ' + (_this.order - 1));
       if ('xyz'.indexOf(axis) == -1) throw new Error('Rotation on invalid axis: ' + axis);
       var dirAngle;
-      var rotationAngleInterval = 15;
+      var rotationAngleInterval = 10;
       var tempSclice = {};
       _this.rotating = true;
 
@@ -911,7 +911,7 @@ var pause = function pause() {
 
 var play = function () {
   var _ref3 = _asyncToGenerator(regeneratorRuntime.mark(function _callee2() {
-    var finalSteps, i, data;
+    var id;
     return regeneratorRuntime.wrap(function _callee2$(_context2) {
       while (1) {
         switch (_context2.prev = _context2.next) {
@@ -925,7 +925,6 @@ var play = function () {
             return _context2.abrupt("return");
 
           case 3:
-            ;
             Array.from(document.getElementsByClassName("hideOnPlay")).forEach(function (e) {
               return e.style.display = "none";
             });
@@ -933,42 +932,22 @@ var play = function () {
               return e.style.display = "unset";
             });
             window.isPause = false;
-            finalSteps = window.solved;
-            i = window.currentStep || 0;
+            id = setInterval(function () {
+              if (window.isPause) {
+                console.log("Paused");
+                clearInterval(id);
+              }
 
-          case 9:
-            if (!(i < finalSteps.length)) {
-              _context2.next = 21;
-              break;
-            }
+              if (window.currentStep === window.solved.length - 1) {
+                console.log("Finished");
+                pause();
+                clearInterval(id);
+              }
 
-            window.currentStep = i;
+              oneMove(1);
+            }, 400);
 
-            if (!window.isPause) {
-              _context2.next = 13;
-              break;
-            }
-
-            return _context2.abrupt("return");
-
-          case 13:
-            _context2.next = 15;
-            return cube.rotate(finalSteps[i])();
-
-          case 15:
-            data = _context2.sent;
-            console.log(i, finalSteps[i], data);
-            window.prevDir = 1;
-
-          case 18:
-            i++;
-            _context2.next = 9;
-            break;
-
-          case 21:
-            pause();
-
-          case 22:
+          case 7:
           case "end":
             return _context2.stop();
         }
@@ -997,7 +976,7 @@ var oneMove = function () {
           case 0:
             i = (window.currentStep || 0) + dir + (dir !== window.prevDir ? window.prevDir : 0);
 
-            if (!(i < 0 || i >= window.solved.length || !window.isPause)) {
+            if (!(i < 0 || i >= window.solved.length)) {
               _context3.next = 4;
               break;
             }
@@ -1026,3 +1005,11 @@ var oneMove = function () {
     return _ref4.apply(this, arguments);
   };
 }();
+
+var handlePrevNext = function handlePrevNext(dir) {
+  if (!window.isPause) {
+    console.log("Already playing...");
+  } else {
+    oneMove(dir);
+  }
+};

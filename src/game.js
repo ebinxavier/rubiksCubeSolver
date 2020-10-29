@@ -295,7 +295,7 @@ class Cube {
             if('xyz'.indexOf(axis)==-1)
             throw new Error('Rotation on invalid axis: '+axis);
             let dirAngle;
-            let rotationAngleInterval =15;
+            let rotationAngleInterval =10;
             const tempSclice = {};
             this.rotating= true;
             switch(axis){
@@ -579,25 +579,29 @@ const pause = () => {
     Array.from(document.getElementsByClassName("showOnPlay")).forEach(e=>e.style.display="none");
     
 }
+
 const play = async () => {
-    if(!window.isPause) {
+    if(!window.isPause){
         pause();
         return;
-    };
+    }
     Array.from(document.getElementsByClassName("hideOnPlay")).forEach(e=>e.style.display="none");
     Array.from(document.getElementsByClassName("showOnPlay")).forEach(e=>e.style.display="unset");
-    
+        
     window.isPause=false;
-    const finalSteps = window.solved;
-    for(let i=window.currentStep  || 0; i<finalSteps.length; i++){
-        window.currentStep = i;
-        if(window.isPause) return;
-        const data = await cube.rotate(finalSteps[i])();
-        console.log(i, finalSteps[i], data);
-        window.prevDir=1;
-    }
-    // cube.editMode = true;
-    pause();
+    const id = setInterval(()=>{
+        if(window.isPause) {
+            console.log("Paused");
+            clearInterval(id)
+        }
+        if(window.currentStep === window.solved.length -1 ){
+            console.log("Finished");
+            pause();
+            clearInterval(id)
+        }
+        oneMove(1);
+    }, 400);
+
 }
 const getInverse = (move) => {
     if(move.includes('prime')) return move.split('prime')[0];
@@ -606,7 +610,7 @@ const getInverse = (move) => {
 window.prevDir=-1;
 const oneMove = async (dir) => {
     let i= (window.currentStep  || 0) + dir + (dir!==window.prevDir ?window.prevDir:0 );
-    if(i<0 || i>= window.solved.length || !window.isPause){
+    if(i<0 || i>= window.solved.length){
         console.log("Operation not allowed!!");
         return;
     }
@@ -616,4 +620,12 @@ const oneMove = async (dir) => {
     const step = dir === -1 ? getInverse(finalSteps[i]) : finalSteps[i];
     console.log(i, finalSteps[i], step);
     await cube.rotate(step)();
+}
+
+const handlePrevNext = (dir) => {
+    if(!window.isPause){
+        console.log("Already playing...")
+    } else {
+        oneMove(dir);
+    }
 }
